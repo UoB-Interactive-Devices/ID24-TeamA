@@ -22,6 +22,9 @@
 // Use I2C, no reset pin!
 Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
+#define Led A3;
+#define Hall A4;
+
 const int buttonPin = 2;
 const int motorPin = 6;
 
@@ -62,6 +65,10 @@ void setup() {
 
   pinMode(buttonPin, INPUT);
   pinMode(motorPin, OUTPUT);
+
+  pinMode(Led, OUTPUT);
+  pinMode(Hall, INPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -105,6 +112,13 @@ void loop() {
     Serial.println("nom nom");
   } else if (buttonState == LOW) {
     down = false;
+  }
+
+  Serial.println(digitalRead(Hall));
+  if (digitalRead(Hall) == 0) {
+    digitalWrite(Led, HIGH);
+  } else if {
+    digitalWrite(Led, LOW);
   }
 
   uint8_t touched = cap.touched();
