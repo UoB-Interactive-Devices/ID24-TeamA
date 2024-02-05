@@ -22,19 +22,19 @@
 // Use I2C, no reset pin!
 Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
-#define Led A3;
-#define Hall A4;
-#define motor 7;
-
-const int buttonPin = 2;
-const int motorPin = 6;
+const int redPin 5;
+const int greenPin 6;
+const int bluePin 7;
+const int hallPin 9;
+const int motorPin 12;
 
 unsigned long previousfoodmillis, motorpreviousMillis = 0UL;
 unsigned long foodinterval = 600UL;
 
 int food = 60;
+int petting = 60;
 
-int buttonState = 0;
+int hallState = 0;
 int motorState = 0;
 bool down = false;
 int vibrateOn = 0;
@@ -63,12 +63,11 @@ void setup() {
   }
   Serial.println("CAP1188 found!");
 
-  pinMode(buttonPin, INPUT);
-  pinMode(motorPin, OUTPUT);
-
-  pinMode(Led, OUTPUT);
-  pinMode(Hall, INPUT);
-  pinMode(motor, INPUT);
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  pinMode(hallPin, INPUT);
+  pinMode(motorPin, INPUT);
 }
 
 void loop() {
@@ -82,13 +81,13 @@ void loop() {
 
   //sleep?
 
-  buttonState = digitalRead(buttonPin);
+  hallState = digitalRead(hallPin);
 
   unsigned long currentMillis = millis();
   if(currentMillis - motorpreviousMillis > 1000UL){
       if (vibrateOn == 0){
         digitalWrite(motorPin, 1);
-        vibrateOn =1;
+        vibrateOn = 1;
         motorpreviousMillis = currentMillis;
       } else if (vibrateOn == 1){
         digitalWrite(motorPin, 0);
@@ -105,24 +104,24 @@ void loop() {
     Serial.println(food);
   }
 
-  if ((buttonState == HIGH) && (!down)){
+  if ((hallState == HIGH) && (!down)){
     down = true;
     food += 20;
     food = overfeed(food);
     Serial.println("nom nom");
-  } else if (buttonState == LOW) {
+  } else if (hallState == LOW) {
     down = false;
   }
 
-  Serial.println(digitalRead(Hall));
-  if (digitalRead(Hall) == 0) {
+  Serial.println(digitalRead(hallPin));
+  if (digitalRead(hallPin) == 0) {
     digitalWrite(Led, HIGH);
   } else if {
     digitalWrite(Led, LOW);
   }
 
   uint8_t touched = cap.touched();
-  digitalWrite(motor, LOW);
+  digitalWrite(motorPin, LOW);
 
   if (touched == 0) {
     // No touch detected
@@ -132,7 +131,7 @@ void loop() {
   for (uint8_t i=0; i<8; i++) {
     if (touched & (1 << i)) {
       if (i == 6) {
-        digitalWrite(motor, HIGH);
+        digitalWrite(motorPin, HIGH);
       }
       Serial.print("C"); Serial.print(i+1); Serial.print("\t");
     }
@@ -141,3 +140,8 @@ void loop() {
   delay(50);
 }
 
+void setColor(int redValue, int greenValue, int blueValue) {
+  analogWrite(redPin, redValue);
+  analogWrite(greenPin, greenValue);
+  analogWrite(bluePin, blueValue);
+}
