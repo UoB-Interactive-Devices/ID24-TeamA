@@ -51,7 +51,6 @@ int overfeed(int food) {
 
 void setup() {
   // put your setup code here, to run once:
-
   Serial.begin(9600);
   Serial.println("CAP1188 test!");
 
@@ -68,7 +67,6 @@ void setup() {
 
   pinMode(Led, OUTPUT);
   pinMode(Hall, INPUT);
-  Serial.begin(9600);
 }
 
 void loop() {
