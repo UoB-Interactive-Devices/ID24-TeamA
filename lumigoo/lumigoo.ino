@@ -24,6 +24,7 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
 #define Led A3;
 #define Hall A4;
+#define motor 7;
 
 const int buttonPin = 2;
 const int motorPin = 6;
@@ -67,6 +68,7 @@ void setup() {
 
   pinMode(Led, OUTPUT);
   pinMode(Hall, INPUT);
+  pinMode(motor, INPUT);
 }
 
 void loop() {
@@ -120,6 +122,7 @@ void loop() {
   }
 
   uint8_t touched = cap.touched();
+  digitalWrite(motor, LOW);
 
   if (touched == 0) {
     // No touch detected
@@ -128,6 +131,9 @@ void loop() {
   
   for (uint8_t i=0; i<8; i++) {
     if (touched & (1 << i)) {
+      if (i == 6) {
+        digitalWrite(motor, HIGH);
+      }
       Serial.print("C"); Serial.print(i+1); Serial.print("\t");
     }
   }
