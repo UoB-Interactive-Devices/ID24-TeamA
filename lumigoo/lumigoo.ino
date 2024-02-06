@@ -22,11 +22,11 @@
 // Use I2C, no reset pin!
 Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
-const int redPin 5;
-const int greenPin 6;
-const int bluePin 7;
-const int hallPin 9;
-const int motorPin 12;
+const int redPin = 5;
+const int greenPin = 6;
+const int bluePin = 7;
+const int hallPin = 8;
+const int motorPin = 12;
 
 unsigned long previousfoodmillis, motorpreviousMillis = 0UL;
 unsigned long foodinterval = 600UL;
@@ -67,7 +67,7 @@ void setup() {
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
   pinMode(hallPin, INPUT);
-  pinMode(motorPin, INPUT);
+  pinMode(motorPin, OUTPUT);  //INPUT -> OUTPUT
 }
 
 void loop() {
@@ -91,7 +91,7 @@ void loop() {
         motorpreviousMillis = currentMillis;
       } else if (vibrateOn == 1){
         digitalWrite(motorPin, 0);
-        vibrateOn =0;
+        vibrateOn = 0;
         motorpreviousMillis = currentMillis;
       }
   }
@@ -115,9 +115,9 @@ void loop() {
 
   Serial.println(digitalRead(hallPin));
   if (digitalRead(hallPin) == 0) {
-    digitalWrite(Led, HIGH);
-  } else if {
-    digitalWrite(Led, LOW);
+    setColor(0, 255, 0);         //changed digitalWrite() -> setColor()
+  } else if (digitalRead(hallPin) == 1){
+    setColor(255, 0, 0);          //changed digitalWrite() -> setColor()
   }
 
   uint8_t touched = cap.touched();
@@ -136,8 +136,8 @@ void loop() {
       Serial.print("C"); Serial.print(i+1); Serial.print("\t");
     }
   }
-  Serial.println();
-  delay(50);
+  // Serial.println();
+  // delay(50);
 }
 
 void setColor(int redValue, int greenValue, int blueValue) {
