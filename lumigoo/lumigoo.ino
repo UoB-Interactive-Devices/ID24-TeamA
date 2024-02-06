@@ -24,25 +24,26 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
 const int redPin = 5;
 const int greenPin = 6;
-const int bluePin = 7;
+const int bluePin = 10;
 const int hallPin = 8;
 const int motorPin = 12;
 
-unsigned long previousfoodmillis, motorpreviousMillis = 0UL;
+unsigned long previousfoodmillis, previouspetMillis, motorpreviousMillis = 0UL;
 unsigned long foodinterval = 600UL;
 
-int food = 60;
-int petting = 60;
+int food = 255;
+float petting = 255;
 
 int hallState = 0;
 int motorState = 0;
 bool down = false;
+
 int vibrateOn = 0;
 
 
-int overfeed(int food) {
-  if(food > 60){
-      food = 60;
+float overfeed(float food) {
+  if(food > 255){    //60 -> 255
+      food = 255;
   } else if(food < 0){
     food = 0;
   }
@@ -97,27 +98,49 @@ void loop() {
   }
 
   currentMillis = millis();
+  if(currentMillis - previouspetMillis > foodinterval){
+    petting -= 10;
+    petting = overfeed(petting);
+    previouspetMillis = currentMillis;
+    Serial.print("pet: ");
+    Serial.println(petting);
+  }
+
+  currentMillis = millis();
   if(currentMillis - previousfoodmillis > foodinterval){
-    food -= 1;
+    food -= 5;
     food = overfeed(food);
     previousfoodmillis = currentMillis;
+    Serial.print("food: ");
     Serial.println(food);
   }
 
+  // if (food > 40){
+  //   setColor(0, 255, 0);
+  // } else if (food <= 40 && food > 20) {
+  //   setColor(255, 255, 0);
+  // } else if (food <= 20) {
+  //   setColor(255, 0, 0);
+  // }
+
+  setColor(255 - food, food, petting);
+
   if ((hallState == HIGH) && (!down)){
     down = true;
-    food += 20;
+    food += 80;
     food = overfeed(food);
     Serial.println("nom nom");
   } else if (hallState == LOW) {
     down = false;
   }
 
-  Serial.println(digitalRead(hallPin));
+  // Serial.println(digitalRead(hallPin));
   if (digitalRead(hallPin) == 0) {
-    setColor(0, 255, 0);         //changed digitalWrite() -> setColor()
+    hallState = HIGH;
+    setColor(0, 0, 255);         //changed digitalWrite() -> setColor()
   } else if (digitalRead(hallPin) == 1){
-    setColor(255, 0, 0);          //changed digitalWrite() -> setColor()
+    hallState = LOW;
+    // setColor(255, 0, 0);          //changed digitalWrite() -> setColor()
   }
 
   uint8_t touched = cap.touched();
@@ -132,8 +155,11 @@ void loop() {
     if (touched & (1 << i)) {
       if (i == 6) {
         digitalWrite(motorPin, HIGH);
+        petting += 0.05;
+        petting = overfeed(petting);
+        // Serial.println("brr");
       }
-      Serial.print("C"); Serial.print(i+1); Serial.print("\t");
+      // Serial.print("C"); Serial.print(i+1); Serial.print("\t");
     }
   }
   // Serial.println();
