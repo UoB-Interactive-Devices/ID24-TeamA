@@ -7,3 +7,4 @@
 6. Interactive trace-and-draw?? based on popular artist
 7. Interactive color by numbers a popular painting
 8. Navigate your SS Britain!!!
+9. AR/Audio on SS Great Britain to recreate ship activitites
