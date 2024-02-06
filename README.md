@@ -14,3 +14,6 @@
 13. Projection onto artefacts to show how they've changed through time
 14. Community interaction project, almost like an interactive guest list where every visitor adds something to the exhibit and maybe that changes the exhibit in some meaningful way depending on who has visited/how many
 15. Bounty hunt around a museum, using artefacts as clues
+16. lunar rover
+17. AR fossil reconstruction
+18. Fossil jigsaw
