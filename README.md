@@ -10,3 +10,5 @@
 9. AR/Audio on SS Great Britain to recreate ship activities.
 10. VR Piloting or CO-piloting exhibition.
 11. Red/Blue Shift interaction in a science museum.
+12. Instruments with weird gadgets
+13. 
