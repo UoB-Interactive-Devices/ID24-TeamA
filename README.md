@@ -4,3 +4,5 @@
 3. Touch-sensitive exhibition in MShed.
 4. Drums in Kings Weston Roman Villa
 5. Detection based exhibition in MShed (maybe in the social section).
+6. Interactive trace-and-draw?? based on popular artist
+7. Interactive color by numbers a popular painting
