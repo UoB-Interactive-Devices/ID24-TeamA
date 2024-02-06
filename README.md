@@ -11,4 +11,6 @@
 10. VR Piloting or CO-piloting exhibition.
 11. Red/Blue Shift interaction in a science museum.
 12. Instruments with weird gadgets
-13. 
+13. Projection onto artefacts to show how they've changed through time
+14. Community interaction project, almost like an interactive guest list where every visitor adds something to the exhibit and maybe that changes the exhibit in some meaningful way depending on who has visited/how many
+15. Bounty hunt around a museum, using artefacts as clues
