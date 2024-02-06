@@ -6,3 +6,4 @@
 5. Detection based exhibition in MShed (maybe in the social section).
 6. Interactive trace-and-draw?? based on popular artist
 7. Interactive color by numbers a popular painting
+8. Navigate your SS Britain!!!
