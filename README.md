@@ -1,4 +1,4 @@
-<h1>ID24-TeamA</h1>h1>
+<h1>ID24-TeamA</h1>
 
 <h2>Fossil Jigsaw Puzzle</h2>
 
