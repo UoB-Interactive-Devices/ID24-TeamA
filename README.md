@@ -4,7 +4,16 @@
 
 **Ideas**
 - Projection mapping
-- 3D printed? Ply-wood?
+- 3D printed? Plywood?
 - Probably not bones but actual limbs
 - Sensing tech (RFID?)
 - Magnets for connection? Sockets and Brackets?
+- Pins for communication?
+- Tracking marker?
+- 
+
+**TODO**
+- Figure out how building blocks communicate
+- Orientation of blocks
+- Projecting methods
+- 
