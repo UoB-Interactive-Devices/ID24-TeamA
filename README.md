@@ -17,3 +17,7 @@
 - Orientation of blocks
 - Projecting methods
 - 
+
+**Links**
+- [Magnetic Jigsaw Puzzle patent](https://patents.google.com/patent/US4258920A/en)
+- [Using Pogo Pins to Add Electrical Connectivity to Your 3D Printed Fixtures](https://www.javelin-tech.com/blog/2016/10/pogo-pins-3d-printed-fixtures/)
