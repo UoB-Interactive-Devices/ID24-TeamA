@@ -1,6 +1,6 @@
 <h1>ID24-TeamA</h1>
 
-**TAs**
+## TAs ##
 - Primary TA: Jed
 - Secondary TA: Mamoru
 
