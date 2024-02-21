@@ -1,7 +1,8 @@
 <h1>ID24-TeamA</h1>
 
-Primary TA: Jed
-Secondary TA: Mamoru
+***TAs***
+- Primary TA: Jed
+- Secondary TA: Mamoru
 
 <h2>Fossil Jigsaw Puzzle</h2>
 
