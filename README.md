@@ -29,3 +29,8 @@
 - [Projection Mapping (many projectors)](https://www.researchgate.net/publication/305081970_A_method_for_realistic_3D_projection_mapping_using_multiple_projectors)
 - [Projection Mapping (one projector)](https://www.lumenarius.com/how-3d-projection-mapping-works)
 - 
+
+**Related Work**
+- Sony Block Jam
+- Topobo
+- (look at tangible interface literature)
