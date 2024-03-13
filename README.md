@@ -38,3 +38,5 @@
 
 **Abstract**
 This project is a 3-D jigsaw set that allows users to build their own version of a dinosaur. It consists of boxes connected using magnets. Each box has a microprocessor that calculates its location.
+
+Imagine an exhibit that allows you to build your own dinosaur and bring it to life with 
