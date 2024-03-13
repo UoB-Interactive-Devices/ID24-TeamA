@@ -37,9 +37,10 @@
 - Sony Block Jam
 - Topobo
 - (look at tangible interface literature)
-- https://meshprj.com/en/
+- [Sony Mesh](https://meshprj.com/en/)
 - [Technological Probes](https://dl.acm.org/doi/10.1145/642611.642616)
 - [Cultural Probes](https://dl.acm.org/doi/10.1145/291224.291235)
+- [SandScape](https://tangible.media.mit.edu/project/sandscape/)
 
 
 **Abstract**
