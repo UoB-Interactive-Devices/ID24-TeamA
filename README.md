@@ -34,3 +34,7 @@
 - Sony Block Jam
 - Topobo
 - (look at tangible interface literature)
+
+
+**Abstract**
+This project is a 3-D jigsaw set that allows users to build their own version of a dinosaur. It is a set of boxes that are connected using magnets. Each box has a microprocessor that calculates its location.
