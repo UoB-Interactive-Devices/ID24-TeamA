@@ -29,6 +29,7 @@
 - [Projection Mapping (many projectors)](https://www.researchgate.net/publication/305081970_A_method_for_realistic_3D_projection_mapping_using_multiple_projectors)
 - [Projection Mapping (one projector)](https://www.lumenarius.com/how-3d-projection-mapping-works)
 
+
 **Overleaf link**
 - Overleaf Project: https://www.overleaf.com/3838139783vxtgscycbmnf#843a97  
 
@@ -37,6 +38,8 @@
 - Topobo
 - (look at tangible interface literature)
 - https://meshprj.com/en/
+- [Technological Probes](https://dl.acm.org/doi/10.1145/642611.642616)
+- [Cultural Probes](https://dl.acm.org/doi/10.1145/291224.291235)
 
 
 **Abstract**
