@@ -283,12 +283,10 @@ def start_projection():
     cv2.waitKey(1)
     
 def update_projection(voxel_grid):
-    print('updating')
     # compute voxel grid
     indices = np.transpose((voxel_grid == 1).nonzero())
     for i in indices:
         i[2] = 12 - i[2]
-    print(indices)
     buffer = update_blocks(indices)
 
     # load tex and grid

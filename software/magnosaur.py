@@ -1,6 +1,8 @@
 import signal
 import serial
+import socket
 import sys
+import random
 import keyboard
 import numpy as np
 import cv2
@@ -8,6 +10,14 @@ import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 from projection import *
 import time
+import _thread
+import asyncio
+
+# Define server IP address and port
+SERVER_ADDRESS = ("192.168.137.1", 8080)
+
+BUFFER_SIZE = 4096  # Adjust buffer size as needed
+TIMEOUT_SECONDS = 5  # Adjust timeout value as needed
 
 # ser = serial.Serial(port="COM5", parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE)
 # ser.flush()
@@ -45,6 +55,76 @@ box_connections = {
         "bottom" : {'1':[0,0,1]}
         }
     }
+
+# Function to detect request
+def detector(request):
+    try:
+        if request.decode()[0] == 'x':
+            print(request[1:].decode())
+            return request.decode()
+    except:
+        pass
+
+# Function to handle incoming HTTP requests
+async def handle_request(client_sock):
+    global all_connections
+    global current_connection
+    repeat = False
+    try:
+        client_sock.settimeout(TIMEOUT_SECONDS)
+        while True:
+            request = await loop.sock_recv(client_sock, BUFFER_SIZE)
+            print(request)
+            if not request:
+                break
+            response = detector(request)
+            split_response = response.split("_")
+            #print(split_response)
+            name = split_response[1]
+            face = split_response[2]
+            # Respond with a simple "OK" message            
+            if response[1] == 'C':
+                name = split_response[1]
+                print("Connected to: " + name)
+            if response[1] == 'P':
+                for x in current_connection:
+                    if x[0] == box_type and x[1] == box_id:
+                        repeat = True
+
+                if repeat:
+                    repeat = False
+                else:
+                    current_connection.append([split_response[1], split_response[2], split_response[3]])
+                print(current_connection)
+                print("length:", len(current_connection))
+
+                    
+                if len(current_connection) == 2:
+                    print("thats enough connections!!!")
+                    
+                    #when two boxes are connected, add there objects both to all_connections
+                    #print("Connecting " + str(current_connection))
+                    
+                    existing, new = find_existing_and_new(all_connections, current_connection)
+                    print("existing:", existing_node)
+                    print("new:", existing_node)
+                    print(all_connections, current_connection)
+
+                    add_box(existing, new)
+                    current_connection = []
+
+                    return
+
+            if response[1] == 'R':
+                return
+            if response[1] == 'H':
+                await loop.sock_sendall(client_sock, b"badum")
+    except socket.timeout:
+        print("Connection timed out")
+    except Exception as e:
+        print("An error occurred:", e)
+    finally:
+        client_sock.close()
 
 def add_box_grid(coord_1, coord_2, type):
     coord_1 = np.round(coord_1).astype(int)
@@ -469,33 +549,50 @@ def add_box(existing, new):
     new_node.rotate_to_match(existing_node, new_con[0], existing_con[0], conn_point1, conn_point2)
     add_box_grid(new_node.location[0], new_node.location[1], new_node.box_type)
     
+# Main function
+async def main():
+    # #first array is information about an existing box, first coord is existingconnection, second coord is new
+    # time.sleep(1)
+    # new_node = add_box(['l', 1, 'top/1'], ['b', 1, 'bottom/1'])
+    # time.sleep(1)
+    # new_node = add_box(['b', 1, 'bottom/2'], ['l', 2, 'top/1'])
+    # new_node = add_box(['b', 1, 'bottom/3'], ['l', 3, 'top/1'])
+    # new_node = add_box(['b', 1, 'bottom/4'], ['l', 4, 'top/1'])
 
-#first array is information about an existing box, first coord is existingconnection, second coord is new
-time.sleep(1)
-new_node = add_box(['l', 1, 'top/1'], ['b', 1, 'bottom/1'])
-time.sleep(1)
-new_node = add_box(['b', 1, 'bottom/2'], ['l', 2, 'top/1'])
-new_node = add_box(['b', 1, 'bottom/3'], ['l', 3, 'top/1'])
-new_node = add_box(['b', 1, 'bottom/4'], ['l', 4, 'top/1'])
+    # new_node = add_box(['b', 1, 'back/1'], ['n', 1, 'top/1'])
+    # time.sleep(1)
+    # new_node = add_box(['b', 1, 'front/1'], ['h', 1, 'back/1'])
 
-new_node = add_box(['b', 1, 'back/1'], ['n', 1, 'top/1'])
-time.sleep(1)
-new_node = add_box(['b', 1, 'front/1'], ['h', 1, 'back/1'])
+    # time.sleep(1)
+    # remove(['b', 1])
 
-time.sleep(1)
-remove(['b', 1])
+    # time.sleep(1)
+    # remove(['n', 1])
 
-time.sleep(1)
-remove(['n', 1])
+    # time.sleep(1)
+    # remove(['h', 1])
 
-time.sleep(1)
-remove(['h', 1])
+    # time.sleep(1)
+    # remove(['l', 2])
+    # remove(['l', 3])
+    # remove(['l', 4])
 
-time.sleep(1)
-remove(['l', 2])
-remove(['l', 3])
-remove(['l', 4])
-time.sleep(100)
+    # Create a TCP/IP socket
+    server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_sock.bind(SERVER_ADDRESS)
+    server_sock.listen()
+
+    print("Server is listening on", SERVER_ADDRESS)
+    while True:
+        client_sock, addr = await loop.sock_accept(server_sock)
+        print("Connection from:", addr)
+        asyncio.create_task(handle_request(client_sock))
+
+
+# Create event loop and run the server
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+
 #print_grid(grid)
 #visualize_grid(grid)
 # input()
