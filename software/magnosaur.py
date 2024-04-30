@@ -3,9 +3,11 @@ import serial
 import sys
 import keyboard
 import numpy as np
-import opencv as cv2
+import cv2
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+# from mpl_toolkits.mplot3d import Axes3D
+from projection import *
+import time
 
 # ser = serial.Serial(port="COM5", parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE)
 # ser.flush()
@@ -77,7 +79,36 @@ def add_box_grid(coord_1, coord_2, type):
             for y in range(min(y1, y2), max(y1, y2) + 1):
                 for z in range(min(z1, z2), max(z1, z2) + 1):
                     grid[x][y][z] = 1
+    update_projection(grid)
     
+def remove(params):
+    for node in nodes:
+        if node.box_type == params[0] and node.box_id == params[1]:
+            removeable = node
+
+    coord_1 = removeable.location[0]
+    coord_2 = removeable.location[1]
+
+
+    coord_1 = np.round(coord_1).astype(int)
+    coord_2 = np.round(coord_2).astype(int)
+    x1 = coord_1[0]
+    y1 = coord_1[1]
+    z1 = coord_1[2]
+
+    x2 = coord_2[0]
+    y2 = coord_2[1]
+    z2 = coord_2[2]
+
+    grid[x1][y1][z1] = 0
+    grid[x2][y2][z2] = 0
+
+    for x in range(min(x1, x2), max(x1, x2) + 1):
+        for y in range(min(y1, y2), max(y1, y2) + 1):
+            for z in range(min(z1, z2), max(z1, z2) + 1):
+                grid[x][y][z] = 0
+
+    update_projection(grid)
 
 
 def print_grid(grid):          
@@ -287,7 +318,9 @@ class BoxNode:
 
 
 
-grid = np.zeros((24, 24, 24))
+grid = np.zeros((24, 13, 12))
+
+start_projection()
 
 nodes = []
 node_names = ["l", "b", "n", "h"]
@@ -302,7 +335,7 @@ for i in range(len(node_names)):
             leg = nodes[len(nodes)-1]
             all_connections.append(leg)
 
-source = [7, 0, 3]
+source = [7, 0, 1]
 leg.location = np.array([[0, 0, 0], [0, 2, 0]])
 leg.location += source
 leg.inStructure = True
@@ -438,24 +471,37 @@ def add_box(existing, new):
     
 
 #first array is information about an existing box, first coord is existingconnection, second coord is new
+time.sleep(1)
 new_node = add_box(['l', 1, 'top/1'], ['b', 1, 'bottom/1'])
-
+time.sleep(1)
 new_node = add_box(['b', 1, 'bottom/2'], ['l', 2, 'top/1'])
-
 new_node = add_box(['b', 1, 'bottom/3'], ['l', 3, 'top/1'])
-
 new_node = add_box(['b', 1, 'bottom/4'], ['l', 4, 'top/1'])
 
 new_node = add_box(['b', 1, 'back/1'], ['n', 1, 'top/1'])
+time.sleep(1)
+new_node = add_box(['b', 1, 'front/1'], ['h', 1, 'back/1'])
 
-new_node = add_box(['b', 1, 'top/3'], ['n', 2, 'bottom/1'])
+time.sleep(1)
+remove(['b', 1])
 
-new_node = add_box(['n', 2, 'top/1'], ['h', 1, 'bottom/1'])
+time.sleep(1)
+remove(['n', 1])
 
+time.sleep(1)
+remove(['h', 1])
+
+time.sleep(1)
+remove(['l', 2])
+remove(['l', 3])
+remove(['l', 4])
+time.sleep(100)
 #print_grid(grid)
-visualize_grid(grid)
+#visualize_grid(grid)
+# input()
 
-# while True:
+#while True:
+
 #     #s.write("data\r".encode())
 #     mes = ser.read_until().strip()
 #     request = mes.decode()
@@ -536,5 +582,4 @@ visualize_grid(grid)
 #             #add_box_grid([1, 2, 1], box_sizes["b"][0], 'bottom')
 #             continue
 
-print("Exiting program...")
     
