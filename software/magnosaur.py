@@ -24,6 +24,8 @@ TIMEOUT_SECONDS = 5  # Adjust timeout value as needed
 
 all_connections = []
 current_connection = []
+current_remove = []
+nodes = []
     
 #dict for sizes
 box_sizes = {
@@ -69,6 +71,8 @@ def detector(request):
 async def handle_request(client_sock):
     global all_connections
     global current_connection
+    global current_remove
+    global nodes
     repeat = False
     try:
         client_sock.settimeout(TIMEOUT_SECONDS)
@@ -78,17 +82,18 @@ async def handle_request(client_sock):
             if not request:
                 break
             response = detector(request)
-            split_response = response.split("_")
-            #print(split_response)
-            name = split_response[1]
-            face = split_response[2]
+            print(response)
+            split_response = response.split("/")
+            print('split:', split_response)
+
             # Respond with a simple "OK" message            
             if response[1] == 'C':
                 name = split_response[1]
                 print("Connected to: " + name)
-            if response[1] == 'P':
+            elif response[1] == 'P':
+                print('pressed')
                 for x in current_connection:
-                    if x[0] == box_type and x[1] == box_id:
+                    if x[0] == split_response[1] and x[1] == split_response[2]:
                         repeat = True
 
                 if repeat:
@@ -101,24 +106,50 @@ async def handle_request(client_sock):
                     
                 if len(current_connection) == 2:
                     print("thats enough connections!!!")
+                    print('current:', current_connection)
+                    #new_node = add_box(['l', 1, 'top.1'], ['l', 2, 'bottom.1'])
                     
                     #when two boxes are connected, add there objects both to all_connections
                     #print("Connecting " + str(current_connection))
                     
                     existing, new = find_existing_and_new(all_connections, current_connection)
-                    print("existing:", existing_node)
-                    print("new:", existing_node)
+                    print("existing:", existing)
+                    print("new:", new)
+                    all_connections.append(new[:2])
+                    
                     print(all_connections, current_connection)
-
+                    
                     add_box(existing, new)
                     current_connection = []
 
                     return
 
-            if response[1] == 'R':
+            elif response[1] == 'R':
+                for x in current_remove:
+                    if x[0] == split_response[1] and x[1] == split_response[2]:
+                        repeat = True
+
+                if repeat:
+                    repeat = False
+                else:
+                    current_remove.append([split_response[1], split_response[2], split_response[3]])
+                print(current_remove)
+                print("remove queue length:", len(current_remove))
+                
+                if len(current_remove) == 2:
+                    for i in reversed(range(len(all_connections))):
+                        for j in range(len(current_remove)):
+                            if all_connections[i][0] == split_response[1] and all_connections[i][1] ==  split_response[2]:
+                                for node in nodes:
+                                    if node.box_type == split_response[1] and node.box_id == split_response[2]:
+                                        remove([node.box_type, node.box_id])
+                                break
+                current_remove = []
                 return
-            if response[1] == 'H':
+
+            elif response[1] == 'H':
                 await loop.sock_sendall(client_sock, b"badum")
+
     except socket.timeout:
         print("Connection timed out")
     except Exception as e:
@@ -402,7 +433,6 @@ grid = np.zeros((24, 13, 12))
 
 start_projection()
 
-nodes = []
 node_names = ["l", "b", "n", "h"]
 node_no = [4, 1, 2, 1]
 
@@ -410,10 +440,10 @@ for i in range(len(node_names)):
     name = node_names[i]
     x = node_no[i]
     for j in range(x):
-        nodes.append(BoxNode(name, j+1))
-        if name == 'l' and j+1 == 1:
+        nodes.append(BoxNode(name, str(j+1)))
+        if name == 'l' and j+1 == 2:
             leg = nodes[len(nodes)-1]
-            all_connections.append(leg)
+            all_connections.append([leg.box_type, leg.box_id])
 
 source = [7, 0, 1]
 leg.location = np.array([[0, 0, 0], [0, 2, 0]])
@@ -421,26 +451,31 @@ leg.location += source
 leg.inStructure = True
 add_box_grid(leg.location[0], leg.location[1], 'l')
 
+#visualize_grid(grid)
 
 def find_existing_and_new(all_connections, connections):
+    print(all_connections, connections)
     for new_node in connections:
         for existing_node in all_connections:
             if new_node[1] == existing_node[1] and new_node[0] == existing_node[0]:
-                existing_id = existing_node
+                for c in connections:
+                    if c[0] == existing_node[0] and c[1] == existing_node[1]:
+                        print(c)
+                        existing_id = c
                 break
         else:
             continue
         break
     # Find the new ID
-    for new_node in new_nodes:
+    for new_node in connections:
         if new_node[1] != existing_id[1] or new_node[0] != existing_id[0]:
             new_id = new_node
             break
-
+    print('found existing')
     return existing_id, new_id
 
 def find_slash(string):
-    index = string.find('/')
+    index = string.find('.')
     if index != -1:
         first_part = string[:index]
         second_part = string[index+1:]
@@ -449,14 +484,16 @@ def find_slash(string):
         return None, None
 
 def add_box(existing, new):
+    print(existing, new)
     for node in nodes:
         if node.box_type == existing[0] and node.box_id == existing[1]:
             existing_node = node
         if node.box_type == new[0] and node.box_id == new[1]:
             new_node = node
     
+    print(new_node.location, existing_node.location)
 
-    #connection in format string "bottom/1" or "top/2"
+    #connection in format string "bottom.1" or "top.2"
     existing_con = find_slash(existing[2])
     new_con = find_slash(new[2])
 
@@ -546,9 +583,31 @@ def add_box(existing, new):
         elif new_con == 'front':
             new_con = 'front'
         
+    print(new_con[0], existing_con[0], conn_point1, conn_point2)
     new_node.rotate_to_match(existing_node, new_con[0], existing_con[0], conn_point1, conn_point2)
     add_box_grid(new_node.location[0], new_node.location[1], new_node.box_type)
-    
+
+def is_complete(connections):
+    head_count = 0
+    body_count = 0
+    neck_count = 0
+    leg_count = 0
+    for connection in connections:
+        if connection.box_type == 'l':
+            leg_count += 1
+        elif connection.box_type == 'n':
+            neck_count += 1
+        elif connection.box_type == 'b':
+            body_count += 1
+        elif connection.box_type == 'h':
+            head_count += 1
+
+    if leg_count == 4 and neck_count == 1 and body_count == 1 and head_count == 1:
+        return 'steg'
+    elif leg_count == 4 and neck_count == 2 and body_count == 1 and head_count == 1:
+        return 'diplo'
+    return 'nah'
+
 # Main function
 async def main():
     # #first array is information about an existing box, first coord is existingconnection, second coord is new
@@ -584,6 +643,11 @@ async def main():
 
     print("Server is listening on", SERVER_ADDRESS)
     while True:
+        # dino = is_complete(all_connections)
+        # if dino == 'steg':
+        #     print("steg")
+        # elif dino == 'diplo':
+        #     print("diplo")
         client_sock, addr = await loop.sock_accept(server_sock)
         print("Connection from:", addr)
         asyncio.create_task(handle_request(client_sock))
